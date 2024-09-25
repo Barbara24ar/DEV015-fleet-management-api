@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model taxis {
+  id    Int     @id
+  plate String? @db.VarChar
+}
+
+model trajectories {
+  id        Int       @id(map: "Id_pkey") @default(autoincrement())
+  taxi_id   Int
+  date      DateTime? @db.Timestamp(6)
+  latitude  Float?
+  longitude Float?
+}
