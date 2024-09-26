@@ -1,5 +1,6 @@
 import express from 'express';  // Importa el framework Express para crear el servidor
 import { PrismaClient } from '@prisma/client';  // Importa PrismaClient para interactuar con la base de datos
+import { getTrajectoriesByTaxiAndDate } from './controllers/trajectoryController';
 
 // Crear instancia de Prisma para interactuar con la base de datos
 const prisma = new PrismaClient();
@@ -43,20 +44,13 @@ app.get('/taxis', async (req, res) => {
   }
 });
 
-// Ruta para obtener todas las trayectorias
-app.get('/trajectories', async (req, res) => {
-  try {
-    // Consultar todas las trayectorias de la base de datos usando Prisma
-    const allTrajectories = await prisma.trajectories.findMany();
+// Ruta para obtener trayectorias filtradas por taxiId y fecha
+// app.get('/trajectories/:taxiId/:date', getTrajectoriesByTaxiAndDate);
 
-    // Responder con la lista de trayectorias obtenida en formato JSON
-    res.json(allTrajectories);
-  } catch (error) {
-    // Manejo de errores: en caso de error, responde con un mensaje y un código de estado 500 (error del servidor)
-    console.error('Error al obtener trayectorias:', error);
-    res.status(500).json({ error: 'Error al obtener trayectorias' });
-  }
-});
+// Ruta original para obtener todas las trayectorias
+app.get('/trajectories', getTrajectoriesByTaxiAndDate);
 
 // Exportar la aplicación para que pueda ser utilizada en otros archivos (en index.ts o pruebas)
 export default app;
+
+
