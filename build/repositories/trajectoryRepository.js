@@ -14,7 +14,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.findTrajectoriesByTaxiAndDate = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
-//falta implementar la hora 00:00:00 y 23:59:59.999
 const findTrajectoriesByTaxiAndDate = (taxiId, date) => __awaiter(void 0, void 0, void 0, function* () {
     const startDate = new Date(date);
     const endDate = new Date(date);

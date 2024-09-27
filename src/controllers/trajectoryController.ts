@@ -1,17 +1,29 @@
 import { Request, Response } from 'express';
-// Importar el repositorio donde está la función para obtener las trayectorias
 import { findTrajectoriesByTaxiAndDate } from '../repositories/trajectoryRepository';
 
-// Controlador para obtener las trayectorias de un taxi dado su ID y una fecha
 export const getTrajectoriesByTaxiAndDate = async (req: Request, res: Response) => {
   const taxiId = req.query.taxiId as string;
   const date = req.query.date as string;
 
+  // Validación de parámetros
+  if (!taxiId || !date) {
+    return res.status(400).json({ error: 'Faltan parámetros requeridos: taxiId o date' });
+  }
+
+  // Validar formato de la fecha
+  const isValidDate = !isNaN(Date.parse(date));
+  if (!isValidDate) {
+    return res.status(400).json({ error: 'Formato de fecha inválido' });
+  }
+
   try {
-    // Llamar a la función del repositorio para obtener las trayectorias filtradas
     const trajectories = await findTrajectoriesByTaxiAndDate(taxiId, date);
 
-    // Enviar la respuesta con las trayectorias encontradas
+    // Manejar el caso de taxi no encontrado o sin trayectorias
+    if (!trajectories || trajectories.length === 0) {
+      return res.status(404).json({ error: 'Taxi no encontrado o sin trayectorias para la fecha dada' });
+    }
+
     res.json(trajectories);
   } catch (error) {
     console.error('Error al obtener trayectorias:', error);
