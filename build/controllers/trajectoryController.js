@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTrajectoriesByTaxiAndDate = void 0;
+exports.getLatestTaxiLocations = exports.getTrajectoriesByTaxiAndDate = void 0;
 const trajectoryRepository_1 = require("../repositories/trajectoryRepository");
+// Controlador para obtener trayectorias por taxiId y fecha
 const getTrajectoriesByTaxiAndDate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const taxiId = req.query.taxiId;
     const date = req.query.date;
@@ -37,3 +38,19 @@ const getTrajectoriesByTaxiAndDate = (req, res) => __awaiter(void 0, void 0, voi
     }
 });
 exports.getTrajectoriesByTaxiAndDate = getTrajectoriesByTaxiAndDate;
+//Controlador para obtener la última ubicación de cada taxi
+const getLatestTaxiLocations = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const latestLocations = yield (0, trajectoryRepository_1.findLatestTaxiLocations)();
+        // Manejar el caso si no se encuentran taxis o ubicaciones
+        if (!latestLocations || latestLocations.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron ubicaciones recientes para los taxis' });
+        }
+        res.json(latestLocations);
+    }
+    catch (error) {
+        console.error('Error al obtener la última ubicación de los taxis:', error);
+        res.status(500).json({ error: 'Error al obtener la última ubicación de los taxis' });
+    }
+});
+exports.getLatestTaxiLocations = getLatestTaxiLocations;

@@ -1,6 +1,6 @@
 "use strict";
-//realizarán consultas a la base de datos mediante Prisma
-//Este archivo contendrá la lógica de la base de datos para consultar trayectorias por taxiId y date
+// Realizarán consultas a la base de datos mediante Prisma
+// Este archivo contendrá la lógica de la base de datos para consultar trayectorias por taxiId y date
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,9 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findTrajectoriesByTaxiAndDate = void 0;
+exports.findLatestTaxiLocations = exports.findTrajectoriesByTaxiAndDate = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
+// Consulta trayectorias por taxiId y fecha
 const findTrajectoriesByTaxiAndDate = (taxiId, date) => __awaiter(void 0, void 0, void 0, function* () {
     const startDate = new Date(date);
     const endDate = new Date(date);
@@ -47,6 +48,48 @@ const findTrajectoriesByTaxiAndDate = (taxiId, date) => __awaiter(void 0, void 0
     return renamedTrajectories;
 });
 exports.findTrajectoriesByTaxiAndDate = findTrajectoriesByTaxiAndDate;
+// Función para obtener la última ubicación de cada taxi
+const findLatestTaxiLocations = () => __awaiter(void 0, void 0, void 0, function* () {
+    const latestLocations = yield prisma.trajectories.groupBy({
+        by: ['taxi_id'], // Agrupa por 'taxi_id'
+        _max: {
+            date: true, // Obtiene la fecha máxima para cada 'taxi_id'
+        },
+        where: {
+            date: {
+                not: null, // Asegura que el campo 'date' no sea null
+            },
+        },
+        orderBy: {
+            _max: {
+                date: 'desc',
+            },
+        },
+    });
+    // Mapeo para ajustar los resultados
+    const renamedLocations = yield Promise.all(latestLocations.map((location) => __awaiter(void 0, void 0, void 0, function* () {
+        const lastLocation = yield prisma.trajectories.findFirst({
+            where: {
+                taxi_id: location.taxi_id,
+                date: location._max.date, // Busca la fecha máxima
+            },
+            select: {
+                taxi_id: true,
+                date: true,
+                latitude: true,
+                longitude: true,
+            },
+        });
+        return {
+            taxiId: lastLocation === null || lastLocation === void 0 ? void 0 : lastLocation.taxi_id,
+            date: lastLocation === null || lastLocation === void 0 ? void 0 : lastLocation.date,
+            latitude: lastLocation === null || lastLocation === void 0 ? void 0 : lastLocation.latitude,
+            longitude: lastLocation === null || lastLocation === void 0 ? void 0 : lastLocation.longitude,
+        };
+    })));
+    return renamedLocations;
+});
+exports.findLatestTaxiLocations = findLatestTaxiLocations;
 //startDate: Es la fecha que representa el inicio del día (00:00:00)
 //endDate: Se ajusta para representar el final del día (23:59:59.999), sumando un día a startDate y restando 1 milisegundo.
 //Filtrado de fechas:

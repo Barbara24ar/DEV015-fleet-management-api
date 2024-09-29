@@ -1,10 +1,11 @@
-//realizarán consultas a la base de datos mediante Prisma
-//Este archivo contendrá la lógica de la base de datos para consultar trayectorias por taxiId y date
+// Realizarán consultas a la base de datos mediante Prisma
+// Este archivo contendrá la lógica de la base de datos para consultar trayectorias por taxiId y date
 
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Consulta trayectorias por taxiId y fecha
 export const findTrajectoriesByTaxiAndDate = async (taxiId: string, date: string) => {
   const startDate = new Date(date);
   const endDate = new Date(date);
@@ -41,6 +42,54 @@ export const findTrajectoriesByTaxiAndDate = async (taxiId: string, date: string
 
   return renamedTrajectories;
 };
+
+// Función para obtener la última ubicación de cada taxi
+export const findLatestTaxiLocations = async () => {
+  const latestLocations = await prisma.trajectories.groupBy({
+    by: ['taxi_id'],  // Agrupa por 'taxi_id'
+    _max: {
+      date: true, // Obtiene la fecha máxima para cada 'taxi_id'
+    },
+    where: {
+      date: {
+        not: null,  // Asegura que el campo 'date' no sea null
+      },
+    },
+    orderBy: {
+      _max: {
+        date: 'desc',
+      },
+    },
+  });
+
+  // Mapeo para ajustar los resultados
+  const renamedLocations = await Promise.all(
+    latestLocations.map(async (location) => {
+      const lastLocation = await prisma.trajectories.findFirst({
+        where: {
+          taxi_id: location.taxi_id,
+          date: location._max.date,  // Busca la fecha máxima
+        },
+        select: {
+          taxi_id: true,
+          date: true,
+          latitude: true,
+          longitude: true,
+        },
+      });
+      return {
+        taxiId: lastLocation?.taxi_id,
+        date: lastLocation?.date,
+        latitude: lastLocation?.latitude,
+        longitude: lastLocation?.longitude,
+      };
+    })
+  );
+
+  return renamedLocations;
+};
+
+
 
 //startDate: Es la fecha que representa el inicio del día (00:00:00)
 //endDate: Se ajusta para representar el final del día (23:59:59.999), sumando un día a startDate y restando 1 milisegundo.

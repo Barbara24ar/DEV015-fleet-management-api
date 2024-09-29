@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { findTrajectoriesByTaxiAndDate } from '../repositories/trajectoryRepository';
+import { findTrajectoriesByTaxiAndDate, findLatestTaxiLocations } from '../repositories/trajectoryRepository';
 
+// Controlador para obtener trayectorias por taxiId y fecha
 export const getTrajectoriesByTaxiAndDate = async (req: Request, res: Response) => {
   const taxiId = req.query.taxiId as string;
   const date = req.query.date as string;
@@ -28,5 +29,22 @@ export const getTrajectoriesByTaxiAndDate = async (req: Request, res: Response) 
   } catch (error) {
     console.error('Error al obtener trayectorias:', error);
     res.status(500).json({ error: 'Error al obtener trayectorias' });
+  }
+};
+
+//Controlador para obtener la última ubicación de cada taxi
+export const getLatestTaxiLocations = async (req: Request, res: Response) => {
+  try {
+    const latestLocations = await findLatestTaxiLocations();
+
+    // Manejar el caso si no se encuentran taxis o ubicaciones
+    if (!latestLocations || latestLocations.length === 0) {
+      return res.status(404).json({ error: 'No se encontraron ubicaciones recientes para los taxis' });
+    }
+
+    res.json(latestLocations);
+  } catch (error) {
+    console.error('Error al obtener la última ubicación de los taxis:', error);
+    res.status(500).json({ error: 'Error al obtener la última ubicación de los taxis' });
   }
 };
