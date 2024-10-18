@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLatestTaxiLocations = exports.getTrajectoriesByTaxiAndDate = void 0;
 const trajectoryRepository_1 = require("../repositories/trajectoryRepository");
+const trajectoryService_1 = require("../services/trajectoryService");
 // Controlador para obtener trayectorias por taxiId y fecha
 const getTrajectoriesByTaxiAndDate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const taxiId = req.query.taxiId;
@@ -41,7 +42,7 @@ exports.getTrajectoriesByTaxiAndDate = getTrajectoriesByTaxiAndDate;
 //Controlador para obtener la última ubicación de cada taxi
 const getLatestTaxiLocations = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const latestLocations = yield (0, trajectoryRepository_1.findLatestTaxiLocations)();
+        const latestLocations = yield (0, trajectoryService_1.getLatestTrajectories)();
         // Manejar el caso si no se encuentran taxis o ubicaciones
         if (!latestLocations || latestLocations.length === 0) {
             return res.status(404).json({ error: 'No se encontraron ubicaciones recientes para los taxis' });

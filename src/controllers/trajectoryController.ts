@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { findTrajectoriesByTaxiAndDate, findLatestTaxiLocations } from '../repositories/trajectoryRepository';
+import { getLatestTrajectories } from '../services/trajectoryService';
 
 // Controlador para obtener trayectorias por taxiId y fecha
 export const getTrajectoriesByTaxiAndDate = async (req: Request, res: Response) => {
@@ -35,7 +36,7 @@ export const getTrajectoriesByTaxiAndDate = async (req: Request, res: Response) 
 //Controlador para obtener la última ubicación de cada taxi
 export const getLatestTaxiLocations = async (req: Request, res: Response) => {
   try {
-    const latestLocations = await findLatestTaxiLocations();
+    const latestLocations = await getLatestTrajectories();
 
     // Manejar el caso si no se encuentran taxis o ubicaciones
     if (!latestLocations || latestLocations.length === 0) {

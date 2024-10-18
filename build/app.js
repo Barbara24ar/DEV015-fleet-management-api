@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
 const trajectoryRoutes_1 = __importDefault(require("./routes/trajectoryRoutes"));
+const userRoutes_1 = require("./routes/userRoutes");
+const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 // Crear instancia de Prisma para interactuar con la base de datos
 const prisma = new client_1.PrismaClient();
 // Crear la aplicación de Express
@@ -54,5 +56,7 @@ app.get('/taxis', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 // Usar el router para las rutas de trayectorias
 app.use(trajectoryRoutes_1.default);
+app.use(userRoutes_1.userRouter);
+app.use(authRoutes_1.default);
 // Exportar la aplicación
 exports.default = app;

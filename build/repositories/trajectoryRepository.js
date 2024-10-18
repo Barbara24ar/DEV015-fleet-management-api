@@ -66,28 +66,7 @@ const findLatestTaxiLocations = () => __awaiter(void 0, void 0, void 0, function
             },
         },
     });
-    // Mapeo para ajustar los resultados
-    const renamedLocations = yield Promise.all(latestLocations.map((location) => __awaiter(void 0, void 0, void 0, function* () {
-        const lastLocation = yield prisma.trajectories.findFirst({
-            where: {
-                taxi_id: location.taxi_id,
-                date: location._max.date, // Busca la fecha máxima
-            },
-            select: {
-                taxi_id: true,
-                date: true,
-                latitude: true,
-                longitude: true,
-            },
-        });
-        return {
-            taxiId: lastLocation === null || lastLocation === void 0 ? void 0 : lastLocation.taxi_id,
-            date: lastLocation === null || lastLocation === void 0 ? void 0 : lastLocation.date,
-            latitude: lastLocation === null || lastLocation === void 0 ? void 0 : lastLocation.latitude,
-            longitude: lastLocation === null || lastLocation === void 0 ? void 0 : lastLocation.longitude,
-        };
-    })));
-    return renamedLocations;
+    return latestLocations;
 });
 exports.findLatestTaxiLocations = findLatestTaxiLocations;
 //startDate: Es la fecha que representa el inicio del día (00:00:00)

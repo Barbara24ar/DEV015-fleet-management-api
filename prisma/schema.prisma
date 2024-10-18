@@ -19,3 +19,11 @@ model trajectories {
   latitude  Float?
   longitude Float?
 }
+
+model users {
+  id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(255)
+  email    String   @unique @db.VarChar(255)
+  password String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+}

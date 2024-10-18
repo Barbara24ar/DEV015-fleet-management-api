@@ -62,31 +62,7 @@ export const findLatestTaxiLocations = async () => {
     },
   });
 
-  // Mapeo para ajustar los resultados
-  const renamedLocations = await Promise.all(
-    latestLocations.map(async (location) => {
-      const lastLocation = await prisma.trajectories.findFirst({
-        where: {
-          taxi_id: location.taxi_id,
-          date: location._max.date,  // Busca la fecha máxima
-        },
-        select: {
-          taxi_id: true,
-          date: true,
-          latitude: true,
-          longitude: true,
-        },
-      });
-      return {
-        taxiId: lastLocation?.taxi_id,
-        date: lastLocation?.date,
-        latitude: lastLocation?.latitude,
-        longitude: lastLocation?.longitude,
-      };
-    })
-  );
-
-  return renamedLocations;
+  return latestLocations;
 };
 
 

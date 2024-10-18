@@ -1,6 +1,8 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import trajectoryRouter from './routes/trajectoryRoutes';
+import { userRouter } from './routes/userRoutes';
+import authRouter from './routes/authRoutes';
 
 // Crear instancia de Prisma para interactuar con la base de datos
 const prisma = new PrismaClient();
@@ -50,6 +52,8 @@ app.get('/taxis', async (req, res) => {
 
 // Usar el router para las rutas de trayectorias
 app.use(trajectoryRouter);
+app.use(userRouter)
+app.use(authRouter)
 
 // Exportar la aplicación
 export default app;
